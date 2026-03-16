@@ -147,7 +147,24 @@ func (c *Client) CreateTask(projectID int64, task map[string]interface{}) (*Task
 }
 
 func (c *Client) UpdateTask(id int64, updates map[string]interface{}) (*Task, error) {
-	body, err := json.Marshal(updates)
+	// GET current task, merge updates on top, then POST
+	// Vikunja replaces all fields on POST, so we must send the full task
+	current, err := c.GetTask(id)
+	if err != nil {
+		return nil, fmt.Errorf("fetch task before update: %w", err)
+	}
+	full := map[string]interface{}{
+		"title":       current.Title,
+		"description": current.Description,
+		"done":        current.Done,
+		"priority":    current.Priority,
+		"due_date":    current.DueDate,
+		"project_id":  current.ProjectID,
+	}
+	for k, v := range updates {
+		full[k] = v
+	}
+	body, err := json.Marshal(full)
 	if err != nil {
 		return nil, err
 	}

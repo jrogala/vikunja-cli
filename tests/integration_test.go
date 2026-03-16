@@ -217,6 +217,9 @@ func initializeScenario(sc *godog.ScenarioContext) {
 	sc.Step(`^I edit task "([^"]*)" with --priority (\d+)$`, s.iEditTaskPriority)
 	sc.Step(`^I edit task "([^"]*)" with --description "([^"]*)"$`, s.iEditTaskDescription)
 	sc.Step(`^I edit task "([^"]*)" with --undone$`, s.iEditTaskUndone)
+	sc.Step(`^I edit task "([^"]*)" with --description ""$`, s.iEditTaskClearDescription)
+	sc.Step(`^a task "([^"]*)" exists in project (\d+) with description "([^"]*)"$`, s.aTaskExistsWithDescription)
+	sc.Step(`^task "([^"]*)" should have description "([^"]*)"$`, s.taskShouldHaveDescription)
 	sc.Step(`^I delete the task "([^"]*)"$`, s.iDeleteTask)
 	sc.Step(`^task "([^"]*)" should not be done$`, s.taskShouldNotBeDone)
 
@@ -612,6 +615,53 @@ func (s *testState) iEditTaskDescription(title, desc string) error {
 		return fmt.Errorf("unknown task %q", title)
 	}
 	return s.runCLI("task", "edit", fmt.Sprintf("%d", id), "--description", desc)
+}
+
+func (s *testState) iEditTaskClearDescription(title string) error {
+	id, ok := s.taskIDs[title]
+	if !ok {
+		return fmt.Errorf("unknown task %q", title)
+	}
+	return s.runCLI("task", "edit", fmt.Sprintf("%d", id), "--description", "")
+}
+
+func (s *testState) aTaskExistsWithDescription(title string, projectID int, desc string) error {
+	data, err := s.apiRequest("PUT", fmt.Sprintf("/projects/%d/tasks", projectID), map[string]any{
+		"title":       title,
+		"description": desc,
+	})
+	if err != nil {
+		return err
+	}
+	var task struct {
+		ID int64 `json:"id"`
+	}
+	if err := json.Unmarshal(data, &task); err != nil {
+		return fmt.Errorf("create task %q: %w", title, err)
+	}
+	s.taskIDs[title] = task.ID
+	return nil
+}
+
+func (s *testState) taskShouldHaveDescription(title, expected string) error {
+	id, ok := s.taskIDs[title]
+	if !ok {
+		return fmt.Errorf("unknown task %q", title)
+	}
+	data, err := s.apiRequest("GET", fmt.Sprintf("/tasks/%d", id), nil)
+	if err != nil {
+		return err
+	}
+	var task struct {
+		Description string `json:"description"`
+	}
+	if err := json.Unmarshal(data, &task); err != nil {
+		return err
+	}
+	if task.Description != expected {
+		return fmt.Errorf("task %q description = %q, want %q", title, task.Description, expected)
+	}
+	return nil
 }
 
 func (s *testState) iEditTaskUndone(title string) error {

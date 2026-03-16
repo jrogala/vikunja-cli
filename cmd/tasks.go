@@ -202,19 +202,21 @@ var taskEditCmd = &cobra.Command{
 			return fmt.Errorf("invalid task ID: %s", args[0])
 		}
 		updates := map[string]any{}
-		if editTitle != "" {
+		if cmd.Flags().Changed("title") {
 			updates["title"] = editTitle
 		}
-		if editDesc != "" {
+		if cmd.Flags().Changed("description") {
 			updates["description"] = editDesc
 		}
-		if editPriority >= 0 {
+		if cmd.Flags().Changed("priority") {
 			updates["priority"] = editPriority
 		}
-		if editDue == "none" {
-			updates["due_date"] = "0001-01-01T00:00:00Z"
-		} else if editDue != "" {
-			updates["due_date"] = editDue + "T09:00:00Z"
+		if cmd.Flags().Changed("due-date") {
+			if editDue == "none" {
+				updates["due_date"] = "0001-01-01T00:00:00Z"
+			} else {
+				updates["due_date"] = editDue + "T09:00:00Z"
+			}
 		}
 		if editUndone {
 			updates["done"] = false

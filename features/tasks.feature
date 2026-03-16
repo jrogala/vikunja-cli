@@ -43,6 +43,16 @@ Feature: Task management
     When I edit task "Describe me" with --description "Added details"
     Then the output should contain "Updated task"
 
+  Scenario: Edit preserves description when not specified
+    Given a task "Keep desc" exists in project 1 with description "Important info"
+    When I edit task "Keep desc" with --priority 3
+    Then task "Keep desc" should have description "Important info"
+
+  Scenario: Edit clears description when set to empty
+    Given a task "Clear desc" exists in project 1 with description "Remove me"
+    When I edit task "Clear desc" with --description ""
+    Then task "Clear desc" should have description ""
+
   Scenario: Mark task as undone
     Given a task "Reopen me" exists in project 1
     And task "Reopen me" is completed
