@@ -23,6 +23,7 @@ var (
 	taskAddProject  int64
 	taskPriority    int
 	taskDue         string
+	taskDesc        string
 )
 
 func init() {
@@ -42,6 +43,7 @@ func init() {
 	taskAddCmd.Flags().Int64VarP(&taskAddProject, "project", "p", 1, "target project ID (default: Inbox)")
 	taskAddCmd.Flags().IntVar(&taskPriority, "priority", 0, "0=none 1=low 2=medium 3=high 4=urgent")
 	taskAddCmd.Flags().StringVar(&taskDue, "due", "", "due date YYYY-MM-DD")
+	taskAddCmd.Flags().StringVar(&taskDesc, "desc", "", "task description")
 }
 
 func newClient() *client.Client {
@@ -128,7 +130,7 @@ var taskGetCmd = &cobra.Command{
 
 var taskAddCmd = &cobra.Command{
 	Use:   "add <title>",
-	Short: "Create a task. Set project with -p, priority with --priority, due with --due.",
+	Short: "Create a task. Flags: -p project, --priority, --due, --desc.",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c := newClient()
@@ -140,6 +142,9 @@ var taskAddCmd = &cobra.Command{
 		}
 		if taskDue != "" {
 			payload["due_date"] = taskDue + "T09:00:00Z"
+		}
+		if taskDesc != "" {
+			payload["description"] = taskDesc
 		}
 		task, err := c.CreateTask(taskAddProject, payload)
 		if err != nil {
