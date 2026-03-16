@@ -39,7 +39,7 @@ vikunja-cli task get <id>              # Get task details
 vikunja-cli task add "Fix login bug"   # Create task in Inbox
 vikunja-cli task add -p 2 "Deploy"     # Create in project 2
 vikunja-cli task add --priority 3 "X"  # Create with high priority
-vikunja-cli task add --due 2026-03-20  # Create with due date
+vikunja-cli task add --due-date 2026-03-20  # Create with due date
 vikunja-cli task done <id>             # Mark task complete
 vikunja-cli task delete <id>           # Delete task
 

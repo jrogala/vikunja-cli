@@ -342,7 +342,7 @@ func (s *testState) iCreateTaskWithPriority(title string, projectID, priority in
 }
 
 func (s *testState) iCreateTaskWithDue(title string, projectID int, due string) error {
-	return s.runCLI("task", "add", "-p", fmt.Sprintf("%d", projectID), "--due", due, title)
+	return s.runCLI("task", "add", "-p", fmt.Sprintf("%d", projectID), "--due-date", due, title)
 }
 
 func (s *testState) aTaskExistsInProjectID(title string, projectID int) error {
