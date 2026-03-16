@@ -213,7 +213,12 @@ func initializeScenario(sc *godog.ScenarioContext) {
 	sc.Step(`^a task "([^"]*)" exists in project "([^"]*)"$`, s.aTaskExistsInProjectName)
 	sc.Step(`^task "([^"]*)" is completed$`, s.taskIsCompleted)
 	sc.Step(`^I complete the task "([^"]*)"$`, s.iCompleteTask)
+	sc.Step(`^I edit task "([^"]*)" with --title "([^"]*)"$`, s.iEditTaskTitle)
+	sc.Step(`^I edit task "([^"]*)" with --priority (\d+)$`, s.iEditTaskPriority)
+	sc.Step(`^I edit task "([^"]*)" with --description "([^"]*)"$`, s.iEditTaskDescription)
+	sc.Step(`^I edit task "([^"]*)" with --undone$`, s.iEditTaskUndone)
 	sc.Step(`^I delete the task "([^"]*)"$`, s.iDeleteTask)
+	sc.Step(`^task "([^"]*)" should not be done$`, s.taskShouldNotBeDone)
 
 	// Project steps
 	sc.Step(`^a project "([^"]*)" exists$`, s.aProjectExists)
@@ -575,6 +580,67 @@ func (s *testState) jsonShouldContainTask(title string) error {
 		}
 	}
 	return fmt.Errorf("task %q not found in JSON output", title)
+}
+
+// Edit steps
+
+func (s *testState) iEditTaskTitle(title, newTitle string) error {
+	id, ok := s.taskIDs[title]
+	if !ok {
+		return fmt.Errorf("unknown task %q", title)
+	}
+	err := s.runCLI("task", "edit", fmt.Sprintf("%d", id), "--title", newTitle)
+	if err != nil {
+		return err
+	}
+	s.taskIDs[newTitle] = id
+	delete(s.taskIDs, title)
+	return nil
+}
+
+func (s *testState) iEditTaskPriority(title string, priority int) error {
+	id, ok := s.taskIDs[title]
+	if !ok {
+		return fmt.Errorf("unknown task %q", title)
+	}
+	return s.runCLI("task", "edit", fmt.Sprintf("%d", id), "--priority", fmt.Sprintf("%d", priority))
+}
+
+func (s *testState) iEditTaskDescription(title, desc string) error {
+	id, ok := s.taskIDs[title]
+	if !ok {
+		return fmt.Errorf("unknown task %q", title)
+	}
+	return s.runCLI("task", "edit", fmt.Sprintf("%d", id), "--description", desc)
+}
+
+func (s *testState) iEditTaskUndone(title string) error {
+	id, ok := s.taskIDs[title]
+	if !ok {
+		return fmt.Errorf("unknown task %q", title)
+	}
+	return s.runCLI("task", "edit", fmt.Sprintf("%d", id), "--undone")
+}
+
+func (s *testState) taskShouldNotBeDone(title string) error {
+	id, ok := s.taskIDs[title]
+	if !ok {
+		return fmt.Errorf("unknown task %q", title)
+	}
+	data, err := s.apiRequest("GET", fmt.Sprintf("/tasks/%d", id), nil)
+	if err != nil {
+		return err
+	}
+	var task struct {
+		Done bool `json:"done"`
+	}
+	if err := json.Unmarshal(data, &task); err != nil {
+		return err
+	}
+	if task.Done {
+		return fmt.Errorf("task %q is still done", title)
+	}
+	return nil
 }
 
 // Setup steps

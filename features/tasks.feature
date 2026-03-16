@@ -27,6 +27,28 @@ Feature: Task management
     When I complete the task "Deploy v2"
     Then task "Deploy v2" should be done
 
+  Scenario: Edit task title
+    Given a task "Old title" exists in project 1
+    When I edit task "Old title" with --title "New title"
+    Then task "New title" should exist
+    And task "Old title" should not exist
+
+  Scenario: Edit task priority
+    Given a task "Prioritize me" exists in project 1
+    When I edit task "Prioritize me" with --priority 4
+    Then task "Prioritize me" should have priority 4
+
+  Scenario: Edit task description
+    Given a task "Describe me" exists in project 1
+    When I edit task "Describe me" with --description "Added details"
+    Then the output should contain "Updated task"
+
+  Scenario: Mark task as undone
+    Given a task "Reopen me" exists in project 1
+    And task "Reopen me" is completed
+    When I edit task "Reopen me" with --undone
+    Then task "Reopen me" should not be done
+
   Scenario: Delete a task
     Given a task "Temp task" exists in project 1
     When I delete the task "Temp task"

@@ -24,6 +24,11 @@ var (
 	taskPriority    int
 	taskDue         string
 	taskDesc        string
+	editTitle       string
+	editDesc        string
+	editPriority    int
+	editDue         string
+	editUndone      bool
 )
 
 func init() {
@@ -32,6 +37,7 @@ func init() {
 	taskCmd.AddCommand(taskGetCmd)
 	taskCmd.AddCommand(taskAddCmd)
 	taskCmd.AddCommand(taskDoneCmd)
+	taskCmd.AddCommand(taskEditCmd)
 	taskCmd.AddCommand(taskDeleteCmd)
 
 	taskListCmd.Flags().Int64VarP(&taskListProject, "project", "p", 0, "filter by project ID")
@@ -39,6 +45,12 @@ func init() {
 	taskListCmd.Flags().BoolVar(&taskShowDone, "done", false, "only completed tasks")
 	taskListCmd.Flags().StringVarP(&taskSortBy, "sort", "s", "due_date", "sort field: due_date|priority|created|updated|title")
 	taskListCmd.Flags().StringVar(&taskSearch, "search", "", "search by title")
+
+	taskEditCmd.Flags().StringVar(&editTitle, "title", "", "new title")
+	taskEditCmd.Flags().StringVar(&editDesc, "description", "", "new description")
+	taskEditCmd.Flags().IntVar(&editPriority, "priority", -1, "new priority 0-4")
+	taskEditCmd.Flags().StringVar(&editDue, "due-date", "", "new due date YYYY-MM-DD (use 'none' to clear)")
+	taskEditCmd.Flags().BoolVar(&editUndone, "undone", false, "mark task as not done")
 
 	taskAddCmd.Flags().Int64VarP(&taskAddProject, "project", "p", 1, "target project ID (default: Inbox)")
 	taskAddCmd.Flags().IntVar(&taskPriority, "priority", 0, "0=none 1=low 2=medium 3=high 4=urgent")
@@ -176,6 +188,49 @@ var taskDoneCmd = &cobra.Command{
 			return printJSON(task)
 		}
 		fmt.Printf("Completed task #%d: %s\n", task.ID, task.Title)
+		return nil
+	},
+}
+
+var taskEditCmd = &cobra.Command{
+	Use:   "edit <id>",
+	Short: "Update a task. Flags: --title, --description, --priority, --due-date, --undone.",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		id, err := strconv.ParseInt(args[0], 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid task ID: %s", args[0])
+		}
+		updates := map[string]any{}
+		if editTitle != "" {
+			updates["title"] = editTitle
+		}
+		if editDesc != "" {
+			updates["description"] = editDesc
+		}
+		if editPriority >= 0 {
+			updates["priority"] = editPriority
+		}
+		if editDue == "none" {
+			updates["due_date"] = "0001-01-01T00:00:00Z"
+		} else if editDue != "" {
+			updates["due_date"] = editDue + "T09:00:00Z"
+		}
+		if editUndone {
+			updates["done"] = false
+		}
+		if len(updates) == 0 {
+			return fmt.Errorf("no changes specified")
+		}
+		c := newClient()
+		task, err := c.UpdateTask(id, updates)
+		if err != nil {
+			return err
+		}
+		if outputJSON {
+			return printJSON(task)
+		}
+		fmt.Printf("Updated task #%d: %s\n", task.ID, task.Title)
 		return nil
 	},
 }
