@@ -76,7 +76,7 @@ var taskCmd = &cobra.Command{
 var taskListCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"ls", "l"},
-	Short:   "List incomplete tasks. Use --all for all, --done for completed only.",
+	Short:   "List incomplete tasks.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c := newClient()
 
@@ -142,7 +142,7 @@ var taskGetCmd = &cobra.Command{
 
 var taskAddCmd = &cobra.Command{
 	Use:   "add <title>",
-	Short: "Create a task. Flags: -p project, --priority, --due-date, --description.",
+	Short: "Create a task in a project.",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c := newClient()
@@ -194,7 +194,7 @@ var taskDoneCmd = &cobra.Command{
 
 var taskEditCmd = &cobra.Command{
 	Use:   "edit <id>",
-	Short: "Update a task. Flags: --title, --description, --priority, --due-date, --undone.",
+	Short: "Update a task by ID.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		id, err := strconv.ParseInt(args[0], 10, 64)
