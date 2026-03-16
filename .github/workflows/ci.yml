@@ -19,6 +19,11 @@ jobs:
       - name: Build
         run: go build ./...
 
+      - name: Lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.6.0
+
       - name: Integration tests
         run: go test ./tests/ -v -count=1 -timeout 180s
 

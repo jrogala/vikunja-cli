@@ -77,7 +77,7 @@ var taskListCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"ls", "l"},
 	Short:   "List incomplete tasks.",
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		c := newClient()
 
 		params := map[string]string{
@@ -122,7 +122,7 @@ var taskGetCmd = &cobra.Command{
 	Use:   "get <id>",
 	Short: "Get one task by ID. Returns all fields.",
 	Args:  cobra.ExactArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, args []string) error {
 		id, err := strconv.ParseInt(args[0], 10, 64)
 		if err != nil {
 			return fmt.Errorf("invalid task ID: %s", args[0])
@@ -144,7 +144,7 @@ var taskAddCmd = &cobra.Command{
 	Use:   "add <title>",
 	Short: "Create a task in a project.",
 	Args:  cobra.MinimumNArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, args []string) error {
 		c := newClient()
 		payload := map[string]any{
 			"title": strings.Join(args, " "),
@@ -174,7 +174,7 @@ var taskDoneCmd = &cobra.Command{
 	Use:   "done <id>",
 	Short: "Mark task as complete by ID.",
 	Args:  cobra.ExactArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, args []string) error {
 		id, err := strconv.ParseInt(args[0], 10, 64)
 		if err != nil {
 			return fmt.Errorf("invalid task ID: %s", args[0])
@@ -241,7 +241,7 @@ var taskDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Permanently delete task by ID.",
 	Args:  cobra.ExactArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, args []string) error {
 		id, err := strconv.ParseInt(args[0], 10, 64)
 		if err != nil {
 			return fmt.Errorf("invalid task ID: %s", args[0])
@@ -307,16 +307,16 @@ func formatDue(due string) string {
 
 func printTasks(tasks []client.Task) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "ID\tDONE\tPRIORITY\tDUE\tTITLE")
+	_, _ = fmt.Fprintln(w, "ID\tDONE\tPRIORITY\tDUE\tTITLE")
 	for _, t := range tasks {
 		done := " "
 		if t.Done {
 			done = "x"
 		}
-		fmt.Fprintf(w, "%d\t[%s]\t%s\t%s\t%s\n",
+		_, _ = fmt.Fprintf(w, "%d\t[%s]\t%s\t%s\t%s\n",
 			t.ID, done, priorityStr(t.Priority), formatDue(t.DueDate), t.Title)
 	}
-	w.Flush()
+	_ = w.Flush()
 }
 
 func printTaskDetail(t *client.Task) {

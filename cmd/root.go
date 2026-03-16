@@ -1,3 +1,4 @@
+// Package cmd implements the vikunja-cli commands.
 package cmd
 
 import (
@@ -22,6 +23,7 @@ func init() {
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 }
 
+// Execute runs the root command.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -29,7 +31,7 @@ func Execute() {
 	}
 }
 
-func customHelp(cmd *cobra.Command, args []string) {
+func customHelp(cmd *cobra.Command, _ []string) {
 	if cmd == rootCmd {
 		printTree()
 		return

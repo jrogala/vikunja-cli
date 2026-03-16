@@ -1,3 +1,4 @@
+// Package config handles CLI configuration from env vars and config files.
 package config
 
 import (
@@ -8,11 +9,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config holds the Vikunja connection settings.
 type Config struct {
 	URL   string `mapstructure:"url"`
 	Token string `mapstructure:"token"`
 }
 
+// Load reads config from env vars (VIKUNJA_URL, VIKUNJA_TOKEN) or ~/.config/vikunja-cli/config.yaml.
 func Load() (*Config, error) {
 	viper.SetEnvPrefix("VIKUNJA")
 	viper.AutomaticEnv()
