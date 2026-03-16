@@ -10,23 +10,25 @@ go install github.com/jrogala/vikunja-cli@latest
 
 ## Configure
 
-Set environment variables:
+Interactive setup (recommended):
+
+```bash
+vikunja-cli setup
+```
+
+This validates the connection and writes to `~/.config/vikunja-cli/config.yaml`.
+
+Alternatively, use environment variables:
 
 ```bash
 export VIKUNJA_URL="https://your-instance.com/api/v1"
 export VIKUNJA_TOKEN="tk_your_api_token"
 ```
 
-Or create `~/.config/vikunja-cli/config.yaml`:
-
-```yaml
-url: https://your-instance.com/api/v1
-token: tk_your_api_token
-```
-
 ## Usage
 
 ```
+vikunja-cli setup                      # Interactive configuration
 vikunja-cli task list                  # List incomplete tasks
 vikunja-cli task list --all            # Include completed tasks
 vikunja-cli task list --done           # Only completed tasks
