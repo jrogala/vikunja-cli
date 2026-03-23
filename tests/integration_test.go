@@ -93,7 +93,8 @@ func startVikunja(ctx context.Context) (testcontainers.Container, string, error)
 			"VIKUNJA_FILES_BASEPATH":             "/tmp/files",
 		},
 		Tmpfs: map[string]string{
-			"/tmp": "rw",
+			"/tmp":    "rw",
+			"/.cache": "rw",
 		},
 		WaitingFor: wait.ForHTTP("/api/v1/info").
 			WithPort("3456/tcp").
