@@ -1,69 +1,58 @@
 # vikunja-cli
 
-A fast CLI client for [Vikunja](https://vikunja.io) task management. Compatible with Vikunja v2.
+CLI for Vikunja task and project management.
 
-## Install
+## Setup
 
-```bash
-go install github.com/jrogala/vikunja-cli@latest
-```
-
-## Configure
-
-Interactive setup (recommended):
+Set env vars or run setup:
 
 ```bash
-vikunja-cli setup
+export VIKUNJA_URL=https://vikunja.example.com/api/v1
+export VIKUNJA_TOKEN=tk_your_api_token
 ```
 
-This validates the connection and writes to `~/.config/vikunja-cli/config.yaml`.
-
-Alternatively, use environment variables:
+Or configure interactively:
 
 ```bash
-export VIKUNJA_URL="https://your-instance.com/api/v1"
-export VIKUNJA_TOKEN="tk_your_api_token"
+vikunja setup
 ```
 
-## Usage
+Config stored at `~/.config/vikunja-cli/config.yaml`.
 
+## Commands
+
+| Command | Description |
+|---|---|
+| `setup` | Configure URL and token interactively |
+| `project list` | List all projects |
+| `task list` | List tasks (flags: --all, --done, -p PROJECT, -s SORT, --search) |
+| `task get` | Show details of a specific task |
+| `task add` | Create a new task (flags: -p PROJECT, --priority, --due-date) |
+| `task done` | Mark a task as completed |
+| `task edit` | Update a task's fields |
+| `task delete` | Delete a task |
+
+Aliases: `task`/`tasks`/`t`, `project`/`projects`/`p`, `list`/`ls`/`l`.
+
+## Examples
+
+```bash
+# List all projects
+vikunja project list
+
+# Add a task to a project with priority
+vikunja task add -p 2 --priority 3 "Fix kitchen light"
+
+# List open tasks in a project
+vikunja task list -p 2
+
+# Mark a task as done
+vikunja task done 42
+
+# Search tasks
+vikunja task list --search "deploy"
 ```
-vikunja-cli setup                      # Interactive configuration
-vikunja-cli task list                  # List incomplete tasks
-vikunja-cli task list --all            # Include completed tasks
-vikunja-cli task list --done           # Only completed tasks
-vikunja-cli task list -p 2             # Filter by project ID
-vikunja-cli task list -s priority      # Sort by priority
-vikunja-cli task list --search "bug"   # Search by title
-vikunja-cli task get <id>              # Get task details
-vikunja-cli task add "Fix login bug"   # Create task in Inbox
-vikunja-cli task add -p 2 "Deploy"     # Create in project 2
-vikunja-cli task add --priority 3 "X"  # Create with high priority
-vikunja-cli task add --due-date 2026-03-20  # Create with due date
-vikunja-cli task done <id>             # Mark task complete
-vikunja-cli task delete <id>           # Delete task
 
-vikunja-cli project list               # List all projects
+## JSON Output
 
-vikunja-cli --json task list           # JSON output (for LLM/scripts)
-```
-
-### Aliases
-
-- `task` / `tasks` / `t`
-- `project` / `projects` / `p`
-- `list` / `ls` / `l`
-
-### Priority levels
-
-| Value | Label  |
-|-------|--------|
-| 0     | None   |
-| 1     | Low    |
-| 2     | Medium |
-| 3     | High   |
-| 4     | Urgent |
-
-## License
-
-MIT
+All commands support `--json` for machine-readable output.
