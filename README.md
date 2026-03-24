@@ -2,6 +2,12 @@
 
 CLI for Vikunja task and project management.
 
+## Install
+
+```bash
+go install github.com/jrogala/vikunja-cli@latest
+```
+
 ## Setup
 
 Set env vars or run setup:
