@@ -43,23 +43,23 @@ Aliases: `task`/`tasks`/`t`, `project`/`projects`/`p`, `list`/`ls`/`l`.
 ## Examples
 
 ```bash
-$ vikunja project list
+$ vikunja-cli project list
 ID  TITLE          FAV  ARCHIVED
 1   Inbox
 2   Work Projects  *
 3   Personal       *
 
-$ vikunja task list -p 2
+$ vikunja-cli task list -p 2
 ID   DONE  PRIORITY  DUE        TITLE
 1    [ ]   HIGH      today      Fix kitchen light
 2    [x]   -         Mar 02     Complete documentation
 3    [ ]   URGENT    tomorrow   Deploy to production
 
-$ vikunja task add -p 2 --priority 3 "Review PR #42"
+$ vikunja-cli task add -p 2 --priority 3 "Review PR #42"
 Created task #4: Review PR #42
 
-$ vikunja task done 42
-Marked task #42 as done
+$ vikunja-cli task done 42
+Completed task #42: Review PR #42
 ```
 
 ## JSON Output
